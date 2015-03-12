@@ -484,6 +484,8 @@ int ExecuteInstruction(const TraceOp &trace_op)
     	SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
 
     }
+    break;
+
     case OP_ADDI_D:
     {
 
@@ -491,45 +493,404 @@ int ExecuteInstruction(const TraceOp &trace_op)
     	int imm16_value = trace_op.int_value;
     	g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
     		source_value + imm16_value;
+        SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
 
     }
+    break;
+
     case OP_ADDI_F: 
+    {
+
+        float source_value = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+        float source_imm16 = trace_op.int_value;
+        float result_value_float = source_value + source_imm16;
+        int result_value_fixed = FLOAT_TO_FIXED1114(result_value_float);
+        g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
+            result_value_fixed;
+    	SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
+
+    }
+    break;
+
     case OP_VADD:
+    {
+
+        /*
+			dest[0] <- src1[0] + src2[0]
+			dest[1] <- src1[1] + src2[1]
+			dest[2] <- src1[2] + src2[2]
+			dest[3] <- src1[3] + src2[3]
+		*/
+		int source_value_1_0 = g_vector_registers[trace_op.vector_registers[1]].element[0].int_value;
+		int source_value_2_0 = g_vector_registers[trace_op.vector_registers[2]].element[0].int_value;
+		int source_value_1_1 = g_vector_registers[trace_op.vector_registers[1]].element[1].int_value;
+		int source_value_2_1 = g_vector_registers[trace_op.vector_registers[2]].element[1].int_value;
+		int source_value_1_2 = g_vector_registers[trace_op.vector_registers[1]].element[2].int_value;
+		int source_value_2_2 = g_vector_registers[trace_op.vector_registers[2]].element[2].int_value;
+		int source_value_1_3 = g_vector_registers[trace_op.vector_registers[1]].element[3].int_value;
+		int source_value_2_3 = g_vector_registers[trace_op.vector_registers[2]].element[3].int_value;
+
+		g_vector_registers[trace_op.vector_registers[0]].element[0].int_value =
+			source_value_1_0 + source_value_2_0;
+		g_vector_registers[trace_op.vector_registers[0]].element[1].int_value =
+			source_value_1_1 + source_value_2_1;
+		g_vector_registers[trace_op.vector_registers[0]].element[2].int_value =
+			source_value_1_2 + source_value_2_2;
+		g_vector_registers[trace_op.vector_registers[0]].element[3].int_value =
+			source_value_1_3 + source_value_2_3;
+
+    }
+    break;
+
     case OP_AND_D:
+    {
+
+    	int source_value_1 = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+    	int source_value_2 = g_scalar_registers[trace_op.scalar_registers[2]].int_value;
+    	g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
+        	source_value_1 & source_value_2;
+        SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
+
+    }
+    break;
+
     case OP_ANDI_D:
+    {
+
+    	int source_value = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+    	int source_imm16 = trace_op.int_value;
+    	g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
+    		source_value & source_imm16;
+    	SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
+
+    }
+    break;
+
     case OP_MOV: 
+    {
+
+    	int source_value = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+    	g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
+    		source_value;
+    	SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
+
+    }
+    break;
+
     case OP_MOVI_D:
+    {
+
+    	int source_imm16 = trace_op.int_value;
+    	g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
+    		source_imm16;
+    	SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
+
+    }
+    break;
+
     case OP_MOVI_F: 
+    {
+
+        float source_imm16 = trace_op.int_value;
+        int source_imm16_fixed = FLOAT_TO_FIXED1114(source_imm16);
+        g_scalar_registers[trace_op.scalar_registers[0]].int_value = 
+            source_imm16_fixed;
+    	SetConditionCodeInt(g_scalar_registers[trace_op.scalar_registers[0]].int_value, 0);
+
+    }
+    break;
+    
     case OP_VMOV:  
+    {
+
+    	int source_value_1_0 = g_vector_registers[trace_op.vector_registers[1]].element[0].int_value;
+    	int source_value_1_1 = g_vector_registers[trace_op.vector_registers[1]].element[1].int_value;
+    	int source_value_1_2 = g_vector_registers[trace_op.vector_registers[1]].element[2].int_value;
+    	int source_value_1_3 = g_vector_registers[trace_op.vector_registers[1]].element[3].int_value;
+
+		g_vector_registers[trace_op.vector_registers[0]].element[0].int_value =
+			source_value_1_0;
+		g_vector_registers[trace_op.vector_registers[0]].element[1].int_value =
+			source_value_1_1;
+		g_vector_registers[trace_op.vector_registers[0]].element[2].int_value =
+			source_value_1_2;
+		g_vector_registers[trace_op.vector_registers[0]].element[3].int_value =
+			source_value_1_3;
+
+    }
+    break;
+
     case OP_VMOVI: 
+    {
+
+    	int source_imm16 = trace_op.int_value;
+
+    	g_vector_registers[trace_op.vector_registers[0]].element[0].int_value =
+			source_imm16;
+		g_vector_registers[trace_op.vector_registers[0]].element[1].int_value =
+			source_imm16;
+		g_vector_registers[trace_op.vector_registers[0]].element[2].int_value =
+			source_imm16;
+		g_vector_registers[trace_op.vector_registers[0]].element[3].int_value =
+			source_imm16;
+
+    }
+    break;
+
     case OP_CMP: 
+    {
+
+    	int source_value_1 = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+      	int source_value_2 = g_scalar_registers[trace_op.scalar_registers[2]].int_value;
+
+      	if (source_value_1 > source_value_2)
+      	{
+      		// cc = P
+      		SetConditionCodeInt(1, 0);
+      	}
+      	else if (source_value_1 < source_value_2)
+      	{
+      		// cc = N
+      		SetConditionCodeInt(0, 1);
+      	}
+      	else
+      	{
+      		// cc = Z
+      		SetConditionCodeInt(0, 0);
+      	}
+
+    }
+    break;
+
     case OP_CMPI:
+    {
+
+    	int source_value = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+      	int source_imm16 = trace_op.int_value;
+
+      	if (source_value > source_imm16)
+      	{
+      		// cc = P
+      		SetConditionCodeInt(1, 0);
+      	}
+      	else if (source_value < source_imm16)
+      	{
+      		// cc = N
+      		SetConditionCodeInt(0, 1);
+      	}
+      	else
+      	{
+      		// cc = Z
+      		SetConditionCodeInt(0, 0);
+      	}
+
+    }
+    break;
+
     case OP_VCOMPMOV: 
+    {
+
+    	int source_value = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+    	int source_idx = trace_op.idx;
+
+    	g_vector_registers[trace_op.vector_registers[0]].element[source_idx].int_value = source_value;
+
+    }
+    break;
+
     case OP_VCOMPMOVI:  
+    {
+
+    	int source_imm16 = trace_op.int_value;
+    	int source_idx = trace_op.idx;
+
+    	g_vector_registers[trace_op.vector_registers[0]].element[source_idx].int_value = source_imm16;
+
+    }
+    break;
+
     case OP_LDB: 
     case OP_LDW:
     case OP_STB:  
     case OP_STW: 
+
     case OP_SETVERTEX: 
+    {
+
+    	/*
+    		The value of vr[1] -> X coordinate
+			The value of vr[2] -> Y coordinate
+			The value of vr[3] -> Z coordinate
+			Ignore the value of vr[0]
+
+			typedef struct VertexRegister_ {
+				int x_value; 
+        		int y_value; 
+		        int z_value; 
+		        int r_value; 
+		        int g_value; 
+		        int b_value; 
+			} VertexRegister;
+
+		*/
+
+		int source_value_1_1 = g_vector_registers[trace_op.vector_registers[1]].element[1].int_value;
+    	int source_value_1_2 = g_vector_registers[trace_op.vector_registers[1]].element[2].int_value;
+    	int source_value_1_3 = g_vector_registers[trace_op.vector_registers[1]].element[3].int_value;
+
+    	g_gpu_vertex_registers[0].x_value = source_value_1_1;
+    	g_gpu_vertex_registers[0].y_value = source_value_1_2;
+    	g_gpu_vertex_registers[0].z_value = source_value_1_3;
+
+    }
+    break;
+
     case OP_SETCOLOR:
+    {
+
+    	/*
+			The value of vr[0] -> R component
+			The value of vr[1] -> G component
+			The value of vr[2] -> B component
+			Ignore the value of vr[3]
+    	*/
+
+		int source_value_1_0 = g_vector_registers[trace_op.vector_registers[1]].element[0].int_value;
+    	int source_value_1_1 = g_vector_registers[trace_op.vector_registers[1]].element[1].int_value;
+    	int source_value_1_2 = g_vector_registers[trace_op.vector_registers[1]].element[2].int_value;
+
+    	g_gpu_vertex_registers[0].r_value = source_value_1_0;
+    	g_gpu_vertex_registers[0].g_value = source_value_1_1;
+    	g_gpu_vertex_registers[0].b_value = source_value_1_2;
+
+    }
+    break;
+
     case OP_ROTATE:  // optional 
     case OP_TRANSLATE: 
+    {
+
+    	/*
+			The value of vr[1]: distance to move on x-axis
+			The value of vr[2]: distance to move on y-axis
+			Ignore the values of vr[0] & vr[3]
+    	*/
+
+		int source_value_1 = g_scalar_registers[trace_op.scalar_registers[1]].int_value;
+		int source_value_2 = g_scalar_registers[trace_op.scalar_registers[2]].int_value;
+
+    	g_gpu_vertex_registers[0].x_value = source_value_1;
+    	g_gpu_vertex_registers[0].y_value = source_value_2;
+
+    }
+    break;
+
     case OP_SCALE:  // optional 
     case OP_PUSHMATRIX:       // deprecated 
     case OP_POPMATRIX:   // deprecated 
     case OP_BEGINPRIMITIVE: 
+    {
+
+    	if (trace_op.primitive_type)
+    	{
+    		// triangle
+    	}
+    	else
+    	{
+    		// line
+    	}
+
+    }
+    break;
+
     case OP_ENDPRIMITIVE:
     case OP_LOADIDENTITY:  // deprecated 
     case OP_FLUSH: 
     case OP_DRAW: 
+
     case OP_BRN: 
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 4)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_BRZ:
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 2)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_BRP:
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 1)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_BRNZ:
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 6)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_BRNP:
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 5)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_BRZP:
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 3)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_BRNZP:
+    {
+    	// NZP
+    	if (g_condition_code_register.int_value == 7)
+    	{
+    		g_current_pc = (trace_op.int_value + g_current_pc) << 2;
+    	}
+
+    }
+    break;
+
     case OP_JMP:
+    {
+
+    	
+
+    }
     case OP_JSR: 
     case OP_JSRR: 
       break; 
